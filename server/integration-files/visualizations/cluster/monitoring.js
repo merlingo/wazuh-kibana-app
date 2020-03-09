@@ -74,5 +74,373 @@ export default [
           '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
       }
     }
-  }
+  },
+  { // Wazuh-App-Statistics-remoted-Recv-bytes
+    _id: 'Wazuh-App-Statistics-remoted-Recv-bytes',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics remoted Recv bytes',
+      visState:
+        '{"title":"Wazuh App Statistics remoted Recv bytes","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:remoted.recv_bytes).fit(mode=average).label(recv_bytes),.es(timefield=timestamp,metric=avg:remoted.recv_bytes).trend().label(Trend)","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-remoted-queue-size
+    _id: 'Wazuh-App-Statistics-remoted-queue-size',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics remoted queue size',
+      visState:
+        '{"title":"Wazuh App Statistics remoted queue size","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:remoted.total_queue_size).fit(mode=average).label(total_queue_size),.es(timefield=timestamp,metric=avg:remoted.queue_size).fit(mode=average).label(queue_size)","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-remoted-event-count
+    _id: 'Wazuh-App-Statistics-remoted-event-count',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics remoted event count',
+      visState:
+        '{"title":"Wazuh App Statistics remoted Recv bytes","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:remoted.evt_count).fit(mode=average).label(evt_count),.es(timefield=timestamp,metric=avg:remoted.evt_count).trend().label(Trend)","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-remoted-messages
+    _id: 'Wazuh-App-Statistics-remoted-messages',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics remoted messages',
+      visState:
+        '{"title":"Wazuh App Statistics remoted messages","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:remoted.msg_sent).fit(mode=average).label(msg_sent),.es(timefield=timestamp,metric=avg:remoted.ctrl_msg_count).fit(mode=average).label(ctrl_msg_count),.es(timefield=timestamp,metric=avg:remoted.discarded_count).fit(mode=average).label(discarded_count),","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-remoted-tcp-sessions
+    _id: 'Wazuh-App-Statistics-remoted-tcp-sessions',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics remoted tcp sessions',
+      visState:
+        '{"title":"Wazuh App Statistics remoted tcp sessions","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:remoted.tcp_sessions).fit(mode=average).label(tcp_sessions)","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-analysisd-alerts-queue
+    _id: 'Wazuh-App-Statistics-analysisd-alerts-queue',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics analysisd alerts queue',
+      visState:
+        '{"title":"Wazuh App Statistics analysisd alerts queue","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:analysisd.alerts_queue_size).fit(mode=average).label(alerts_queue_size),.es(timefield=timestamp,metric=avg:analysisd.alerts_queue_usage).fit(mode=average).label(alerts_queue_usage)","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-analysisd-alerts-written
+    _id: 'Wazuh-App-Statistics-analysisd-alerts-written',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics analysisd alerts written',
+      visState:
+        '{"title":"Wazuh App Statistics analysisd alerts written","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:analysisd.alerts_written).fit(mode=average).label(alerts_written)","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-analysisd-events-queue
+    _id: 'Wazuh-App-Statistics-analysisd-events-queue',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics analysisd events queue',
+      visState:
+        '{"title":"Wazuh App Statistics analysisd events queue","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:analysisd.event_queue_size).fit(mode=average).label(event_queue_size),.es(timefield=timestamp,metric=avg:analysisd.event_queue_usage).fit(mode=average).label(event_queue_usage),","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-analysisd-events-received
+    _id: 'Wazuh-App-Statistics-analysisd-events-received',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics analysisd events received',
+      visState:
+        '{"title":"Wazuh App Statistics analysisd events received","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:analysisd.events_received).fit(mode=average).label(events_received),.es(timefield=timestamp,metric=avg:analysisd.events_processed).fit(mode=average).label(events_processed),.es(timefield=timestamp,metric=avg:analysisd.events_dropped).fit(mode=average).label(events_dropped),.es(timefield=timestamp,metric=avg:analysisd.events_edps).fit(mode=average).label(events_edps),","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-analysisd-firewall-queue
+    _id: 'Wazuh-App-Statistics-analysisd-firewall-queue',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics analysisd firewall queue',
+      visState:
+        '{"title":"Wazuh App Statistics analysisd firewall queue","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:analysisd.firewall_queue_size).fit(mode=average).label(firewall_queue_size),.es(timefield=timestamp,metric=avg:analysisd.firewall_queue_usage).fit(mode=average).label(firewall_queue_usage),","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-analysisd-firewall-written
+    _id: 'Wazuh-App-Statistics-analysisd-firewall-written',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics analysisd firewall written',
+      visState:
+        '{"title":"Wazuh App Statistics analysisd firewall written","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:analysisd.firewall_written).fit(mode=average).label(firewall_written)","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-analysisd-hostinfo-queue
+    _id: 'Wazuh-App-Statistics-analysisd-hostinfo-queue',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics analysisd hostinfo queue',
+      visState:
+        '{"title":"Wazuh App Statistics analysisd hostinfo queue","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:analysisd.hostinfo_queue_size).fit(mode=average).label(hostinfo_queue_size),.es(timefield=timestamp,metric=avg:analysisd.hostinfo_queue_usage).fit(mode=average).label(hostinfo_queue_usage),","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-analysisd-hostinfo-event-decoded
+    _id: 'Wazuh-App-Statistics-analysisd-hostinfo-event-decoded',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics analysisd hostinfo event decoded',
+      visState:
+        '{"title":"Wazuh App Statistics analysisd hostinfo event decoded","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:analysisd.hostinfo_events_decoded).fit(mode=average).label(hostinfo_events_decoded),.es(timefield=timestamp,metric=avg:analysisd.hostinfo_edps).fit(mode=average).label(hostinfo_edps),","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-analysisd-rootcheck-queue
+    _id: 'Wazuh-App-Statistics-analysisd-rootcheck-queue',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics analysisd rootcheck queue',
+      visState:
+        '{"title":"Wazuh App Statistics analysisd rootcheck queue","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:analysisd.rootcheck_queue_size).fit(mode=average).label(rootcheck_queue_size),.es(timefield=timestamp,metric=avg:analysisd.rootcheck_queue_usage).fit(mode=average).label(rootcheck_queue_usage),","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-analysisd-rootcheck-event-decoded
+    _id: 'Wazuh-App-Statistics-analysisd-rootcheck-event-decoded',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics analysisd rootcheck event decoded',
+      visState:
+        '{"title":"Wazuh App Statistics analysisd rootcheck event decoded","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:analysisd.rootcheck_events_decoded).fit(mode=average).label(rootcheck_events_decoded),.es(timefield=timestamp,metric=avg:analysisd.rootcheck_edps).fit(mode=average).label(rootcheck_edps),","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-analysisd-sca-queue
+    _id: 'Wazuh-App-Statistics-analysisd-sca-queue',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics analysisd sca queue',
+      visState:
+        '{"title":"Wazuh App Statistics analysisd sca queue","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:analysisd.sca_queue_size).fit(mode=average).label(sca_queue_size),.es(timefield=timestamp,metric=avg:analysisd.sca_queue_usage).fit(mode=average).label(sca_queue_usage),","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-analysisd-sca-event-decoded
+    _id: 'Wazuh-App-Statistics-analysisd-sca-event-decoded',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics analysisd sca event decoded',
+      visState:
+        '{"title":"Wazuh App Statistics analysisd sca event decoded","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:analysisd.sca_events_decoded).fit(mode=average).label(sca_events_decoded),.es(timefield=timestamp,metric=avg:analysisd.sca_edps).fit(mode=average).label(sca_edps),","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-analysisd-syscheck-queue
+    _id: 'Wazuh-App-Statistics-analysisd-syscheck-queue',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics analysisd syscheck queue',
+      visState:
+        '{"title":"Wazuh App Statistics analysisd syscheck queue","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:analysisd.syscheck_queue_size).fit(mode=average).label(syscheck_queue_size),.es(timefield=timestamp,metric=avg:analysisd.syscheck_queue_usage).fit(mode=average).label(syscheck_queue_usage),","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-analysisd-syscheck-event-decoded
+    _id: 'Wazuh-App-Statistics-analysisd-syscheck-event-decoded',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics analysisd syscheck event decoded',
+      visState:
+        '{"title":"Wazuh App Statistics analysisd syscheck event decoded","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:analysisd.syscheck_events_decoded).fit(mode=average).label(syscheck_events_decoded),.es(timefield=timestamp,metric=avg:analysisd.syscheck_edps).fit(mode=average).label(sca_edps),","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-analysisd-syscollector-queue
+    _id: 'Wazuh-App-Statistics-analysisd-syscollector-queue',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics analysisd syscollector queue',
+      visState:
+        '{"title":"Wazuh App Statistics analysisd syscollector queue","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:analysisd.syscollector_queue_size).fit(mode=average).label(syscollector_queue_size),.es(timefield=timestamp,metric=avg:analysisd.syscollector_queue_usage).fit(mode=average).label(syscollector_queue_usage),","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-analysisd-syscollector-event-decoded
+    _id: 'Wazuh-App-Statistics-analysisd-syscollector-event-decoded',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics analysisd syscollector event decoded',
+      visState:
+        '{"title":"Wazuh App Statistics analysisd syscollector event decoded","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:analysisd.syscollector_events_decoded).fit(mode=average).label(syscollector_events_decoded),.es(timefield=timestamp,metric=avg:analysisd.syscollector_edps).fit(mode=average).label(sca_edps),","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-analysisd-winevt-queue
+    _id: 'Wazuh-App-Statistics-analysisd-winevt-queue',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics analysisd winevt queue',
+      visState:
+        '{"title":"Wazuh App Statistics analysisd winevt queue","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:analysisd.winevt_queue_size).fit(mode=average).label(winevt_queue_size),.es(timefield=timestamp,metric=avg:analysisd.winevt_queue_usage).fit(mode=average).label(winevt_queue_usage),","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  { // Wazuh-App-Statistics-analysisd-winevt-event-decoded
+    _id: 'Wazuh-App-Statistics-analysisd-winevt-event-decoded',
+    _type: 'visualization',
+    _source: {
+      title: 'Wazuh App Statistics analysisd winevt event decoded',
+      visState:
+        '{"title":"Wazuh App Statistics analysisd winevt event decoded","type":"timelion","params":{"expression":".es(timefield=timestamp,metric=avg:analysisd.winevt_events_decoded).fit(mode=average).label(winevt_events_decoded),.es(timefield=timestamp,metric=avg:analysisd.winevt_edps).fit(mode=average).label(sca_edps),","interval":"auto"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-statistic*","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
 ];

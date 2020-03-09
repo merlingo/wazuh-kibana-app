@@ -11,42 +11,68 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexItem, EuiFlexGroup, EuiButtonEmpty, EuiInMemoryTable, EuiPanel, EuiTitle, EuiPage, EuiText, EuiCallOut, EuiTabs, EuiTab, EuiSpacer, EuiSelect, EuiProgress } from '@elastic/eui';
+import {
+  EuiFlexItem,
+  EuiFlexGroup,
+  EuiButtonEmpty,
+  EuiPanel,
+  EuiTitle,
+  EuiPage,
+  EuiText,
+  EuiTabs,
+  EuiTab,
+  EuiSpacer,
+  EuiSelect,
+} from '@elastic/eui';
+import { connect } from 'react-redux';
+import { updateVis } from '../../../../../redux/actions/visualizationsActions'
 
-import StatisticsHandler from './utils/statistics-handler'
+import KibanaVis from '../../../../../kibana-integrations/kibana-vis';
 import { clusterNodes } from '../configuration/utils/wz-fetch';
+import { GenericRequest } from '../../../../../react-services/generic-request';
+import { RawVisualizations } from '../../../../../factories/raw-visualizations';
+import { DiscoverPendingUpdates } from '../../../../../factories/discover-pending-updates';
 
-export class WzStatisticsOverview extends Component {
+class WzStatisticsOverview extends Component {
   _isMounted = false;
+  info = {
+    remoted: `Remoted statistics are cumulative, this means that the
+     information shown is since the data exists.`,
+    analysisd: `Analysisd statistics refer to the data stored from the
+     period indicated in the variable 'analysisd.state_interval'.`
+  };
+  tabs = ['remoted', 'analysisd'].map(item => { return { id: item, name: item } })
+
   constructor(props) {
     super(props);
     this.state = {
       selectedTabId: 'remoted',
       stats: {},
-      isLoading: false,
       searchvalue: '',
-      clusterNodeSelected: false
+      clusterNodeSelected: false,
     };
-    this.statisticsHandler = StatisticsHandler;
-    this.tabs = [
-      {
-        id: 'remoted',
-        name: 'remoted'
-      },
-      {
-        id: 'analysisd',
-        name: 'analysisd'
-      },
-    ];
-
-    this.info = {
-      remoted: 'Remoted statistics are cumulative, this means that the information shown is since the data exists.',
-      analysisd: "Analysisd statistics refer to the data stored from the period indicated in the variable 'analysisd.state_interval'."
-    };
+    this.rawVisualizations = new RawVisualizations();
+    this.discoverPendingUpdates = new DiscoverPendingUpdates();
   }
 
   async componentDidMount() {
     this._isMounted = true;
+
+    this.discoverPendingUpdates.addItem(
+      { query: "", language: "lucene" },
+      [
+        {
+          "meta": { "removable": false, "index": "wazuh-statistics*", "negate": false, "disabled": false, "alias": null, "type": "phrase", "key": "cluster", "params": { "query": "false" } },
+          "query": { "match": { "cluster": { "query": "false", "type": "phrase" } } },
+          "$state": { "store": "appState" }
+        }
+      ]
+    );
+    GenericRequest.request(
+      'POST',
+      `/elastic/visualizations/cluster-monitoring/wazuh-alerts-3.x-*`,
+      { nodes: { items: [], name: 'node01' } })
+      .then(visData => this.rawVisualizations.assignItems(visData.data.raw));
     try {
       const data = await clusterNodes();
       const nodes = data.data.data.items.map(item => {
@@ -62,10 +88,7 @@ export class WzStatisticsOverview extends Component {
         clusterNodeSelected: false
       });
     }
-    this.fetchData();
   }
-
-  componentDidUpdate() { }
 
   componentWillUnmount() {
     this._isMounted = false;
@@ -74,22 +97,9 @@ export class WzStatisticsOverview extends Component {
   onSelectedTabChanged = id => {
     this.setState({
       selectedTabId: id,
-      searchvalue: ''
-    }, () => {
-      this.fetchData();
+      searchvalue: '',
     });
   };
-
-  async fetchData() {
-    this.setState({
-      isLoading: true,
-    });
-    const data = await this.statisticsHandler.demonStatistics(this.state.selectedTabId, this.state.clusterNodeSelected);
-    this.setState({
-      stats: data.data.data,
-      isLoading: false
-    });
-  }
 
   renderTabs() {
     return this.tabs.map((tab, index) => (
@@ -106,92 +116,127 @@ export class WzStatisticsOverview extends Component {
   onSelectNode = e => {
     this.setState({
       clusterNodeSelected: e.target.value
-    }, () => {
-      this.fetchData();
     });
   };
 
-  render() {
-    const refreshButton = (
-      <EuiButtonEmpty iconType="refresh" onClick={async () => await this.fetchData()}>
-        Refresh
-      </EuiButtonEmpty>
-    );
-    const search = {
-      box: {
-        incremental: true,
-        schema: true
-      }
-    };
+  renderVisualization(visID, title) {
     return (
-      <EuiPage style={{ background: 'transparent' }}>
-        <EuiPanel>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiTitle>
-                    <h2>Statistics</h2>
-                  </EuiTitle>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>{refreshButton}</EuiFlexItem>
-            {!!(this.state.clusterNodes && this.state.clusterNodes.length && this.state.clusterNodeSelected) && (
-              <EuiFlexItem grow={false} >
-                <EuiSelect
-                  id="selectNode"
-                  options={this.state.clusterNodes}
-                  value={this.state.clusterNodeSelected}
-                  onChange={this.onSelectNode}
-                  aria-label="Select node"
-                />
+      <EuiFlexItem>
+        <EuiTitle size="s"><p>{title}</p></EuiTitle>
+        <KibanaVis
+          visID={visID}
+          tab={'statistics'}
+          updateRootScope={() => { }} >
+        </KibanaVis>
+      </EuiFlexItem>
+    );
+  }
+
+  renderRemotedVisualizations() {
+    return (<div>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+        {this.renderVisualization('Wazuh-App-Statistics-remoted-queue-size', 'Queue')}
+      </EuiFlexGroup>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+        {this.renderVisualization('Wazuh-App-Statistics-remoted-Recv-bytes', 'Received Bytes')}
+        {this.renderVisualization('Wazuh-App-Statistics-remoted-event-count', 'Event count')}
+      </EuiFlexGroup>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+        {this.renderVisualization('Wazuh-App-Statistics-remoted-messages', 'Message stats')}
+        {this.renderVisualization('Wazuh-App-Statistics-remoted-tcp-sessions', 'TCP Sessions')}
+      </EuiFlexGroup>
+    </div>
+    );
+  }
+
+  renderAnalisysdVisualizations() {
+    return (<div>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-alerts-queue', 'Alerts Queue')}
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-alerts-written', 'Alerts Queue')}
+      </EuiFlexGroup>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-events-queue', 'Events Queue')}
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-events-received', 'Events Received')}
+      </EuiFlexGroup>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-firewall-queue', 'Firewall Queue')}
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-firewall-written', 'Firewall Written')}
+      </EuiFlexGroup>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-hostinfo-queue', 'Hostinfo Queue')}
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-hostinfo-event-decoded', 'Hostinfo events decoded')}
+      </EuiFlexGroup>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-rootcheck-queue', 'Rootcheck Queue')}
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-rootcheck-event-decoded', 'Rootcheck events decoded')}
+      </EuiFlexGroup>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-sca-queue', 'Sca Queue')}
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-sca-event-decoded', 'Sca events decoded')}
+      </EuiFlexGroup>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-syscheck-queue', 'Syscheck Queue')}
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-syscheck-event-decoded', 'Syscheck events decoded')}
+      </EuiFlexGroup>
+      <EuiFlexGroup style={{ minHeight: 250 }}>
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-winevt-queue', 'Winevt Queue')}
+        {this.renderVisualization('Wazuh-App-Statistics-analysisd-winevt-event-decoded', 'Winevt events decoded')}
+      </EuiFlexGroup>
+    </div>
+    );
+  }
+
+  render() {
+    const { clusterNodes, clusterNodeSelected, selectedTabId } = this.state;
+    return (
+      <EuiPanel>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiTitle size="l"><p>Statistics</p></EuiTitle>
               </EuiFlexItem>
-            )}
-          </EuiFlexGroup>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiText color="subdued">
-                From here you can see daemon statistics.
-              </EuiText>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiTabs>{
-                this.renderTabs()
-              }</EuiTabs>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiSpacer size={'m'} />
-          {this.state.isLoading &&
-            <EuiProgress size="xs" color="primary" />
-          }
-          {!!((Object.entries(this.state.stats) || []).length && !this.state.isLoading) && (
-            <div>
-              <EuiCallOut title={this.info[this.state.selectedTabId]} iconType="iInCircle" />
-              <EuiSpacer size={'m'} />
-              <EuiInMemoryTable
-                items={Object.entries(this.state.stats)}
-                columns={[
-                  {
-                    field: '0',
-                    name: 'Indicator',
-                  },
-                  {
-                    field: '1',
-                    name: 'Value',
-                  }
-                ]}
-                pagination={true}
-                search={search}
+            </EuiFlexGroup>
+          </EuiFlexItem>
+          {!!(clusterNodes && clusterNodes.length && clusterNodeSelected) && (
+            <EuiFlexItem grow={false} >
+              <EuiSelect
+                id="selectNode"
+                options={clusterNodes}
+                value={clusterNodeSelected}
+                onChange={this.onSelectNode}
+                aria-label="Select node"
               />
-            </div>
+            </EuiFlexItem>
           )}
-        </EuiPanel>
-      </EuiPage>
+        </EuiFlexGroup>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiText color="subdued">
+              From here you can see daemon statistics.
+              </EuiText>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiTabs>{
+              this.renderTabs()
+            }</EuiTabs>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiSpacer size={'m'} />
+        {selectedTabId === 'remoted' && this.renderRemotedVisualizations()}
+        {selectedTabId === 'analysisd' && this.renderAnalisysdVisualizations()}
+      </EuiPanel>
     );
   }
 }
 
-export default WzStatisticsOverview;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateVis: update => dispatch(updateVis(update)),
+  };
+};
+
+export default connect(null, mapDispatchToProps)(WzStatisticsOverview);
