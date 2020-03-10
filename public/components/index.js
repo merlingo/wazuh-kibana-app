@@ -19,6 +19,7 @@ import { ClusterDisabled } from '../components/management/cluster/cluster-disabl
 import { ClusterTimelions } from '../components/management/cluster/cluster-timelions';
 import { ScaDashboard } from './agents/sca/sca-dashboard';
 import { WelcomeScreenWrapper } from '../components/welcome-screen/welcome-screen-wrapper';
+import WzStatistics from '../controllers/management/components/management/statistics/statistics-main'
 
 const app = uiModules.get('app/wazuh', []);
 app.value('WzFilterBar', WzFilterBar);
@@ -29,3 +30,4 @@ app.value('WelcomeScreenWrapper', WelcomeScreenWrapper);
 app.value('WzBlankScreen', WzBlankScreen);
 app.value('ClusterDisabled', ClusterDisabled);
 app.value('ClusterTimelions', ClusterTimelions);
+app.value('WzStatistics', WzStatistics);
