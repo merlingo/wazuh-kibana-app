@@ -187,7 +187,7 @@ class WzVisualizePopover extends Component {
 
     for (var i = 0; i < 4; i++) {
       const currentSection = this.visualizeSections[i];
-      subsections = subsections.concat(currentSection.subsections.filter(item => this.state.suggestValue === "" || (this.state.suggestValue && TabDescription[item.id].description.toLowerCase().includes(this.state.suggestValue.toLowerCase())) || (this.state.suggestValue && item.name.toLowerCase().includes(this.state.suggestValue.toLowerCase()))).map(item => {
+      subsections = subsections.concat(currentSection.subsections.filter(item => this.state.suggestValue === "" || (this.state.suggestValue && TabDescription[item.id].description.toLowerCase().includes(this.state.suggestValue || ''.toLowerCase())) || (this.state.suggestValue && item.name ||'' .toLowerCase().includes(this.state.suggestValue || ''.toLowerCase()))).map(item => {
         return (this.createSuggestItem(item))
       }));
     }

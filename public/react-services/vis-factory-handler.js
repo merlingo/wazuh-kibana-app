@@ -57,7 +57,7 @@ export class VisFactoryHandler {
    */
   static async buildOverviewVisualizations(filterHandler, tab, subtab, fromDiscover = false) {
     const rawVisualizations = new RawVisualizations();
-    if(rawVisualizations.getType() !== 'general'){
+    //if(rawVisualizations.getType() !== 'general'){
       rawVisualizations.setType('general');
       const $injector = await chrome.dangerouslyGetActiveInjector();
       const commonData = $injector.get('commonData');
@@ -76,7 +76,7 @@ export class VisFactoryHandler {
       } catch (error) {
         return Promise.reject(error);
       }
-    }
+    //}
   }
 
   /**
