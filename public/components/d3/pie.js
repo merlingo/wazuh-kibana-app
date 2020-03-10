@@ -27,11 +27,13 @@ export class Pie extends Component {
 
         const width = this.props.width;
         const height = this.props.height;
+        const noLegend = this.props.noLegend;
+        const customStyle = this.props.customStyle;
         const data = createPie(this.props.data);
-        const colors = this.props.colors || ['#6eadc1','#57c17b','#6f87d8','#663db8','#bc52bc','#9e3533','#daa05d'];
+        const colors = this.props.colors || ['#6eadc1', '#57c17b', '#6f87d8', '#663db8', '#bc52bc', '#9e3533', '#daa05d'];
         return (
-            <svg width={width} height={height}>
-                <g transform={`translate(${(width / 4) - 6} ${height / 2})`}>
+            <svg style={customStyle} width={width} height={height}>
+                <g transform={`translate(${noLegend ? width / 2 : (width / 4) - 6} ${height / 2})`}>
                     {data.map((d, i) => (
                         <Slice key={i}
                             innerRadius={33}
@@ -43,14 +45,15 @@ export class Pie extends Component {
                             fill={colors[i]} />
                     ))}
                 </g>
-                <g transform={`translate(${width / 1.75} 0)`}>
-                    {data.map((d, i) => (
-                        <g key={i} className="legend" transform={`translate(0 ${15 * (i + 1)})`}>
-                            <rect width="10" height="10" fill={colors[i]} stroke={colors[i]}></rect>
-                            <text x="15" y="10" style={{ fontSize: 12 }}>{d.data.label}</text>
-                        </g>
-                    ))}
-                </g>
+                {!noLegend && (
+                    <g transform={`translate(${width / 1.75} 0)`}>
+                        {data.map((d, i) => (
+                            <g key={i} className="legend" transform={`translate(0 ${15 * (i + 1)})`}>
+                                <rect width="10" height="10" fill={colors[i]} stroke={colors[i]}></rect>
+                                <text x="15" y="10" style={{ fontSize: 12 }}>{d.data.label}</text>
+                            </g>
+                        ))}
+                    </g>)}
             </svg>
         );
     }

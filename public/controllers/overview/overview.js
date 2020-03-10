@@ -12,8 +12,11 @@
 import { FilterHandler } from '../../utils/filter-handler';
 import { TabNames } from '../../utils/tab-names';
 import { TabDescription } from '../../../server/reporting/tab-description';
-
 import { timefilter } from 'ui/timefilter';
+import {
+  switchTab,
+} from '../../redux/actions/visualizeActions';
+import store from '../../redux/store'
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 
@@ -96,6 +99,11 @@ export class OverviewController {
         AppState.setExtensions(api, extensions)
     };
 
+    this.addNewExtensionProps = {
+      extensions: this.extensions,
+      setExtensions: (id,extensions) => AppState.setExtensions(id,extensions),
+      api: AppState.getCurrentAPI()
+    };
     this.setTabs();
 
     this.visualizeProps = {
@@ -110,6 +118,12 @@ export class OverviewController {
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
     });
+
+    this.$rootScope.$on('switchVisualizeTab', (evt,params) => {
+      this.switchTab(params.tab,true);
+      this.setTabs();
+    });
+    
   }
 
   /**
@@ -136,13 +150,14 @@ export class OverviewController {
     this.currentPanel = this.commonData.getCurrentPanel(this.tab, false);
 
     if (!this.currentPanel) return;
-
+ 
+    const updateCurrentTab = switchTab(this.tab);
+    store.dispatch(updateCurrentTab);
     const tabs = this.commonData.getTabsFromCurrentPanel(
       this.currentPanel,
       this.extensions,
       this.tabNames
     );
-
     this.overviewTabsProps = {
       clickAction: tab => {
         this.switchTab(tab, true);

@@ -134,3 +134,22 @@ wz-menu {
 .WzManagementSideMenu span {
     font-size: 14px!important;
 }
+
+.visualize-popover.full-screen{
+    width: calc(100vw - 48px);
+    height: calc(100vh - 97px);
+    left: 48px!important;
+    box-shadow: none!important;
+    top: 105px!important;
+    border-radius: 0;
+    border: 1px solid #d3dae6;
+    transition: none;
+    position: fixed;
+}
+
+.visualize-popover .expandIcon{
+    position: absolute;
+    right: 0px;
+    padding: 6px;
+    margin-top: 16px;
+}

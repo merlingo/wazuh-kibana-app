@@ -28,10 +28,12 @@ import {
   EuiCallOut,
   EuiPage
 } from '@elastic/eui';
+import store from '../../../redux/store';
+import { connect } from 'react-redux';
 
 import { TabDescription } from '../../../../server/reporting/tab-description';
 
-export class WelcomeScreen extends Component {
+class WelcomeScreen extends Component {
   constructor(props) {
     super(props);
     this.strtools = new StringsTools();
@@ -254,3 +256,9 @@ WelcomeScreen.propTypes = {
   setExtensions: PropTypes.func,
   api: PropTypes.string
 };
+
+const mapStateToProps = (state) => ({
+	currentTab: state.visualizeReducers.currentTab
+});
+
+export default connect(mapStateToProps, null)(WelcomeScreen);

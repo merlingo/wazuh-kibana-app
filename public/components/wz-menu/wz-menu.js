@@ -18,6 +18,7 @@ import { connect } from 'react-redux';
 import WzReduxProvider from '../../redux/wz-redux-provider';
 import store from '../../redux/store'
 import WzManagementSideMenu from './management-side-menu';
+import WzVisualizePopover from './wz-visualize-popover';
 import { npStart } from 'ui/new_platform'
 import { toastNotifications } from 'ui/notify';
 
@@ -34,7 +35,9 @@ class WzMenu extends Component {
       patternList: [],
       currentSelectedPattern: "",
       isManagementPopoverOpen: false,
-      isVisualizePopoverOpen: false
+      isVisualizePopoverOpen: false,
+      favoriteItems: [],
+      expandedVisualize: false
     };
     this.store = store;
     this.wazuhConfig = new WazuhConfig();
@@ -181,9 +184,43 @@ class WzMenu extends Component {
     });
   }
 
+  visualizePopoverToggle() {
+    this.setState(state => {
+      return { isVisualizePopoverOpen: !state.isVisualizePopoverOpen }
+    });
+  }
+
   onClickManagementButton() {
     this.setMenuItem('manager');
     this.managementPopoverToggle();
+  }
+
+
+  onClickVisualizeButton() {
+    this.setMenuItem('visualize');
+    this.visualizePopoverToggle();
+  }
+  setFavorite(item) {
+    var tmp = this.state.favoriteItems;
+    tmp.push(item);
+    this.setState({ favoriteItems: tmp })
+  }
+
+  getFavoriteButtons() {
+    const result = this.state.favoriteItems.map((item, idx) => {
+      const type = item === "Amazon AWS" ? 'logoAWS' : item === "Osquery" ? "logoOsquery" : "securityApp"
+      return (
+        <EuiButtonEmpty
+          className={"wz-menu-button " + (this.state.currentMenuTab === "wazuh-dev" ? "wz-menu-active" : "")}
+          color="text"
+          href="#/wazuh-dev"
+          onClick={() => this.setMenuItem('wazuh-dev')}>
+          <EuiIcon type={type} color='primary' size='m' />
+          <span style={{ display: "none" }}>Dev Tools</span>
+        </EuiButtonEmpty>
+      )
+    })
+    return result;
   }
 
   render() {
@@ -197,6 +234,15 @@ class WzMenu extends Component {
         <EuiIcon type='managementApp' color='primary' size='m' />Management
       </EuiButtonEmpty>);
 
+    const visualizeButton = (
+      <EuiButtonEmpty
+        className={"wz-menu-button " + (this.state.currentMenuTab === "visualize" ? "wz-menu-active" : "")}
+        color="text"
+        onClick={this.onClickVisualizeButton.bind(this)}
+        iconType="arrowDown"
+        iconSide="right">
+        <EuiIcon type='visualizeApp' color='primary' size='m' />Visualize
+  </EuiButtonEmpty>);
     return (
       <WzReduxProvider>
         <Fragment>
@@ -205,14 +251,35 @@ class WzMenu extends Component {
               <div className="wz-menu-wrapper">
                 <EuiFlexGroup className="wz-menu" responsive={false} direction="row">
                   <EuiFlexItem >
-                    <EuiFlexGroup style={{ marginLeft: "10px", marginTop: "-6px" }}>
+                    <EuiFlexGroup style={{ marginLeft: "10px", marginTop: "-6px" }} className="visualize-popover">
                       <EuiButtonEmpty
                         className={"wz-menu-button " + (this.state.currentMenuTab === "overview" || this.state.currentMenuTab === "health-check" ? "wz-menu-active" : "")}
                         color="text"
                         href="#/overview"
                         onClick={() => this.setMenuItem('overview')} >
-                        <EuiIcon type='visualizeApp' color='primary' size='m' />Visualize
+                        <EuiIcon type='metricbeatApp' color='primary' size='m' />Overview
                     </EuiButtonEmpty>
+
+                      <EuiPopover
+                        className="visualize-popover"
+                        id="popoverVisualize"
+                        button={visualizeButton}
+                        panelClassName={this.state.expandedVisualize && 'visualize-popover full-screen' || 'visualize-popover'}
+                        isOpen={this.state.isVisualizePopoverOpen}
+                        closePopover={() => this.setState({ isVisualizePopoverOpen: !this.state.isVisualizePopoverOpen })}
+                        anchorPosition="downLeft" >
+                        <div>
+                          <button
+                            className="expandIcon"
+                            onClick={() => this.setState({ expandedVisualize: !this.state.expandedVisualize })}>
+                            <EuiIcon type='expand' color='primary' />
+                          </button>
+                          <WzVisualizePopover
+                            visualizePopoverToggle={this.visualizePopoverToggle.bind(this)}
+                            setFavorite={(item) => this.setFavorite(item)}
+                            {...this.props} />
+                        </div>
+                      </EuiPopover>
 
                       <EuiPopover
                         id="popover"
@@ -243,6 +310,9 @@ class WzMenu extends Component {
                         <span className="wz-menu-button-title ">Dev Tools</span>
                       </EuiButtonEmpty>
 
+                      {this.state.favoriteItems.length > 0 &&
+                        this.getFavoriteButtons()
+                      }
 
                     </EuiFlexGroup>
                   </EuiFlexItem>
@@ -320,6 +390,7 @@ class WzMenu extends Component {
 const mapStateToProps = state => {
   return {
     state: state.appStateReducers,
+    currentTab: state.visualizeReducers.currentTab,
   };
 };
 
