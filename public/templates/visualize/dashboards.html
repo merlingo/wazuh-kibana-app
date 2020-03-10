@@ -3,68 +3,33 @@
         <react-component name="RegisterAgent" props="actrl.registerAgentsProps" />
     </div>
     <div ng-show="!actrl.addingNewAgent">
-        <div flex="auto" layout="column" ng-cloak ng-controller="overviewController as octrl">
-            <div ng-if="octrl.tab !== 'extensionsDirectory'" style="padding-bottom: 16px;">
-                <!-- Navigation section -->
-                <div layout="row" layout-align="start center">
-                    <!-- Breadcrumbs -->
-                    <div layout="row" layout-padding>
-                        <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
-                        <div ng-if="octrl.tab !== 'welcome'">
-                            <span class="wz-text-link cursor-pointer"
-                                ng-click="octrl.switchTab('welcome')">Overview</span>
-                            <span> / </span>
-                            <span>{{ octrl.tabNames[octrl.tab] }}</span>
-                        </div>
-                    </div>
-                    <!-- End breadcrumbs -->
-
-                    <!-- Separator -->
-                    <span flex></span>
-                    <!-- End separator -->
-
-                    <!-- Reporting button section -->
-                    <div ng-if="octrl.tab !== 'welcome' && octrl.tabView === 'panels'">
-                        <!-- Report button -->
-                        <button class="kuiButton kuiButton--secondary wz-margin-right-8 small" tooltip="Generate report"
-                            tooltip-placement="bottom"
-                            ng-class="{'euiButtonEmpty--disabled': !rendered || loading || resultState !== 'ready'}"
-                            ng-disabled="!rendered || loading || resultState !== 'ready'"
-                            ng-click="octrl.startVis2Png()" aria-label="Generate report button">
-                            <i class="fa fa-fw fa-print" aria-hidden="true"></i>
-                        </button>
-                    </div>
-                    <!-- End Reporting buttons section -->
-
-                    <!-- Discover/Dashboard buttons section -->
-                    <div ng-if="octrl.tab !== 'welcome'" class="wz-margin-right-8">
-                        <!-- Dashboard button -->
-                        <button class="kuiButton kuiButton--secondary small"
-                            ng-click="octrl.tabView === 'discover' ? octrl.switchSubtab('panels') : octrl.switchSubtab('discover')"
-                            aria-label="Dashboard button">
-                            <span ng-if="octrl.tabView === 'discover'"><i class="fa fa-fw fa-th" aria-hidden="true"></i>
-                                Dashboard</span>
-                            <span ng-if="octrl.tabView === 'panels'"><i class="fa fa-fw fa-compass"
-                                    aria-hidden="true"></i>
-                                Discover</span>
-                        </button>
-                    </div>
-                    <!-- End Discover/Dashboard buttons section -->
+        <div layout="column" ng-controller="overviewController as octrl">
+            <div ng-show="octrl.tab !== 'extensionsDirectory'">
+                
+            <div class="euiPage" style="padding: 12px 8px 0!important" >
+                <div ng-if="octrl.tab !== 'welcome'" style="padding: 0!important" class="euiText euiText--small">
+                    <h2 class="euiTitle euiTitle--medium" style="padding-top:6px">
+                        <span
+                            class="euiTextColor euiTextColor--default">{{ octrl.TabDescription[octrl.tab].title }}</span>
+                        <span class="euiTextColor" style="color:#006BB4"
+                            ng-if="octrl.isAgent && isAgentText"><em>{{isAgentText}}</em></span>
+                    </h2>
+                    <p class="euiTextColor euiTextColor--subdued">
+                        {{octrl.TabDescription[octrl.tab].description}}
+                    </p>
                 </div>
-                <!-- End navigation section -->
-
-                <!-- Navigation bar -->
-                <div ng-if="octrl.overviewTabsProps">
-                    <react-component name="Tabs" props="octrl.overviewTabsProps" />
-                </div>
-                <!-- End of navigation bar -->
+                <span flex></span>
+                <react-component name="VisualizeTopMenu" props="octrl.visualizeTopMenuProps"
+                    ng-if="octrl.tab !== 'welcome'" />
+            </div>
+            <!-- End navigation section -->
 
             <!-- Discover search bar section -->
-            <kbn-dis ng-show="octrl.tab !== 'welcome'"></kbn-dis>
+            <kbn-dis  ng-show="octrl.tab !== 'welcome'" style="padding-bottom: 16px;margin-top: -8px;"></kbn-dis>
             <!-- End Discover search bar section -->
-
+            
             <!-- Loading status section -->
-            <div ng-if="octrl.tab !== 'welcome' && octrl.tabView === 'panels' && !rendered && resultState !== 'none'"
+            <div ng-show="octrl.tab !== 'welcome' && octrl.tabView === 'panels' && !rendered && resultState !== 'none' || resultState === 'Fetching dashboard data...'"
                 class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
                 <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center">
                     <span class="euiLoadingChart euiLoadingChart--large">
@@ -77,7 +42,6 @@
                     <div class="percentage">{{loadingStatus}}</div>
                 </div>
             </div>
-
             <!-- End loading status section -->
 
             <!-- Report status section -->
@@ -125,9 +89,10 @@
                         </a>
                     </div>
                 </div>
-            </div>
             <!-- No results section -->
 
-            <div ng-class="{'no-opacity': resultState === 'none' || !rendered}" ng-show="octrl.tabView === 'panels'">
+            <div ng-class="{'no-opacity': resultState === 'none' || !rendered}" ng-show="octrl.tabView === 'panels' && resultState !== 'Fetching dashboard data...'">
                 <react-component name="WzVisualize" props="octrl.visualizeProps" />
             </div>
+
+        </div>

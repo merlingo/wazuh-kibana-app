@@ -1377,8 +1377,21 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom {
 }
 
 .euiPanel .euiPopover__panel .euiPopover__panel--bottom .euiPopover__panel-isOpen .euiPopover__panel-noArrow .euiPopover__panel-isAttached{
-max-height: 170px;
-overflow-y: scroll;
+  max-height: 170px;
+  overflow-y: scroll;
+}
+
+.agent-selection-table-loading:before{
+    position: absolute;
+    content: '';
+    width: 100%;
+    height: 2px;
+    margin-left: 25px;
+    background-color: #006BB4;
+    -webkit-animation: euiBasicTableLoading 1000ms linear;
+    animation: euiBasicTableLoading 1000ms linear;
+    -webkit-animation-iteration-count: infinite;
+    animation-iteration-count: infinite
 }
 
 .kbnTopNavMenu{

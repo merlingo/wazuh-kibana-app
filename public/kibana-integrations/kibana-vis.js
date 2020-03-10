@@ -12,6 +12,7 @@
 import React, { Component } from 'react';
 
 import $ from 'jquery';
+import _ from 'lodash';
 import { start as embeddables } from 'plugins/embeddable_api/np_ready/public/legacy';
 import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
@@ -83,7 +84,9 @@ class KibanaVis extends Component {
   }
 }
 
-  componentDidUpdate() {
+
+  componentDidUpdate(prevProps) {
+    this.visID = this.props.visID;
     if (this.props.state.shouldUpdate) {
       this.updateVis();
     }
@@ -149,6 +152,11 @@ class KibanaVis extends Component {
 
   myRender = async raw => {
     try {
+     /* const isFound = raw.filter(item => item && item.id === this.visID);
+      if(!isFound.length){
+        this.rendered = true;
+        this.destroyAll();
+      }*/
       const discoverList = this.discoverPendingUpdates.getList();
       const isAgentStatus = this.visID === 'Wazuh-App-Overview-General-Agents-status';
       const timeFilterSeconds = this.calculateTimeFilterSeconds(timefilter.getTime());
@@ -164,11 +172,9 @@ class KibanaVis extends Component {
         filters,
         query,
       };
-
       if (!this.factory) {
         this.factory = embeddables.getEmbeddableFactory('visualization');
       }
-
       if (raw && discoverList.length) {
         // There are pending updates from the discover (which is the one who owns the true app state)
 
@@ -198,6 +204,7 @@ class KibanaVis extends Component {
         }
       }
     } catch (error) {
+      console.log(error)
       if (((error || {}).message || '').includes('not locate that index-pattern-field')) {
         if (this.deadField) {
           this.tabVisualizations.addDeadVis();
@@ -232,10 +239,14 @@ class KibanaVis extends Component {
   destroyAll = () => {
     try {
       this.visualization.destroy();
-    } catch (error) {} // eslint-disable-line
+    } catch (error) {
+      console.log("destroy all err", error)
+    } // eslint-disable-line
     try {
       this.visHandler.destroy();
-    } catch (error) {} // eslint-disable-line
+    } catch (error) {
+      console.log("destroy viss err", error)
+    } // eslint-disable-line
   };
 
   renderComplete = async () => {

@@ -1108,11 +1108,6 @@ function discoverController(
     loadFilters(parameters.filters, parameters.tab);
   });
 
-  $rootScope.$on('testAGENT', (evt, parameters) => {
-    $scope.updateQueryAndFetch({
-      query: $state.query
-    });
-  });
 
   $scope.tabView = $location.search().tabView || 'panels';
   const tabListener = $rootScope.$on('changeTabView', async (evt, parameters) => {

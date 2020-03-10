@@ -19,6 +19,9 @@ import {
 import store from '../../redux/store'
 import { AppState } from '../../react-services/app-state';
 import { WazuhConfig } from '../../react-services/wazuh-config';
+import { VisFactoryHandler } from '../../react-services/vis-factory-handler';
+import { RawVisualizations } from '../../factories/raw-visualizations';
+import { getServices } from 'plugins/kibana/discover/kibana_services';
 
 export class OverviewController {
   /**
@@ -32,7 +35,6 @@ export class OverviewController {
    * @param {*} tabVisualizations
    * @param {*} commonData
    * @param {*} reportingService
-   * @param {*} visFactoryService
    */
   constructor(
     $scope,
@@ -44,7 +46,6 @@ export class OverviewController {
     tabVisualizations,
     commonData,
     reportingService,
-    visFactoryService,
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -55,15 +56,19 @@ export class OverviewController {
     this.tabVisualizations = tabVisualizations;
     this.commonData = commonData;
     this.reportingService = reportingService;
-    this.visFactoryService = visFactoryService;
+    this.visFactoryService = VisFactoryHandler;
     this.wazuhConfig = new WazuhConfig();
     this.showingMitreTable = false;
+    this.rawVisualizations = new RawVisualizations();
   }
 
   /**
    * On controller loads
    */
   $onInit() {
+    const { filterManager } = getServices();
+    this.filterManager = filterManager;
+    this.rawVisualizations.setType("");
     this.wodlesConfiguration = false;
     this.TabDescription = TabDescription;
     this.$rootScope.reportStatus = false;
@@ -104,10 +109,21 @@ export class OverviewController {
       setExtensions: (id,extensions) => AppState.setExtensions(id,extensions),
       api: AppState.getCurrentAPI()
     };
-    this.setTabs();
+    
+    this.visualizeTopMenuProps = {
+      switchDiscover: tab => {
+        this.switchSubtab(tab);
+      },
+      tab: this.tab,
+      subtab: this.subtab,
+      setAgent: async agentList => {
+        this.updateSelectedAgents(agentList)
+      },
+    };
 
     this.visualizeProps = {
       selectedTab: this.tab,
+      isAgent: this.isAgent,
       updateRootScope: (prop, value) => {
         this.$rootScope[prop] = value;
         this.$rootScope.$applyAsync();
@@ -121,9 +137,35 @@ export class OverviewController {
 
     this.$rootScope.$on('switchVisualizeTab', (evt,params) => {
       this.switchTab(params.tab,true);
-      this.setTabs();
     });
     
+  }
+
+  async updateSelectedAgents(agentList){
+    this.isAgent = agentList ? agentList[0] : false;
+    this.$scope.isAgentText = this.isAgent && agentList.length === 1 ? ` of agent ${agentList.toString()}` : this.isAgent && agentList.length > 1 ? ` of ${agentList.length.toString()} agents` : false;
+
+    if(agentList && agentList.length && this.rawVisualizations.getType() !== 'agents'){
+      this.$rootScope.resultState = "Fetching dashboard data...";
+      await this.visFactoryService.buildAgentsVisualizations(
+        this.filterHandler,
+        this.tab,
+        null,
+        agentList,
+        this.tabView === 'discover'
+      ); 
+    }else if(!agentList && this.rawVisualizations.getType() !== 'general'){
+      this.$rootScope.resultState = "Fetching dashboard data...";
+      await this.visFactoryService.buildOverviewVisualizations(
+        this.filterHandler,
+        this.tab,
+        null, //not needed
+        this.tabView === 'discover'
+      );
+    }
+    this.visualizeProps["isAgent"] = agentList; //update dashboard visualizations depending if its an agent or not
+    this.$rootScope.$emit('changeTabView', { tabView: this.tabView, tab: this.tab });
+
   }
 
   /**
@@ -136,40 +178,10 @@ export class OverviewController {
   }
 
   /**
- * Show/hide MITRE table
- */
+   * Show/hide MITRE table
+   */
   switchMitreTab() {
     this.showingMitreTable = !this.showingMitreTable
-  }
-
-  /**
-   * Build the current section tabs
-   */
-  setTabs() {
-    this.overviewTabsProps = false;
-    this.currentPanel = this.commonData.getCurrentPanel(this.tab, false);
-
-    if (!this.currentPanel) return;
- 
-    const updateCurrentTab = switchTab(this.tab);
-    store.dispatch(updateCurrentTab);
-    const tabs = this.commonData.getTabsFromCurrentPanel(
-      this.currentPanel,
-      this.extensions,
-      this.tabNames
-    );
-    this.overviewTabsProps = {
-      clickAction: tab => {
-        this.switchTab(tab, true);
-      },
-      selectedTab:
-        this.tab ||
-        (this.currentPanel && this.currentPanel.length
-          ? this.currentPanel[0]
-          : ''),
-      tabs
-    };
-    this.$scope.$applyAsync();
   }
 
   // Switch subtab
@@ -182,12 +194,13 @@ export class OverviewController {
       this.$location.search('tabView', subtab);
 
       if (subtab === 'panels' && this.tab !== 'welcome') {
-        await this.visFactoryService.buildOverviewVisualizations(
-          this.filterHandler,
-          this.tab,
-          subtab,
-          this.tabView === 'discover'
-        );
+         await this.visFactoryService.buildOverviewVisualizations(
+           this.filterHandler,
+           this.tab,
+           subtab,
+           this.tabView === 'discover'
+         );
+          this.$rootScope.$emit('changeTabView', { tabView: subtab, tab:this.tab });
       } else {
         this.$scope.$emit('changeTabView', {
           tabView: subtab,
@@ -198,6 +211,7 @@ export class OverviewController {
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
+    this.visualizeTopMenuProps.subtab = subtab;
     this.$scope.$applyAsync();
     return;
   }
@@ -214,7 +228,7 @@ export class OverviewController {
   // Switch tab
   async switchTab(newTab, force = false) {
     this.tabVisualizations.setTab(newTab);
-    if (newTab !== 'pci' && newTab !== 'gdpr' && newTab !== 'hipaa' && newTab !== 'nist') {
+    if (newTab !== 'pci' && newTab !== 'gdpr' && newTab !== 'hipaa' && newTab !== 'nist'){
       this.visualizeProps.cardReqs = {};
     }
     if (newTab === 'pci') {
@@ -230,6 +244,7 @@ export class OverviewController {
       this.visualizeProps.cardReqs = { items: await this.commonData.getNIST(), reqTitle: 'NIST 800-53 Requirement' };
     }
     this.visualizeProps.selectedTab = newTab;
+    this.visualizeTopMenuProps.tab = newTab;
     this.showingMitreTable = false;
     this.$rootScope.rendered = false;
     this.$rootScope.$applyAsync();
@@ -276,7 +291,6 @@ export class OverviewController {
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
-    this.setTabs();
     this.$scope.$applyAsync();
     return;
   }
@@ -331,9 +345,9 @@ export class OverviewController {
   }
 
   /**
- * Filter by Mitre.ID
- * @param {*} id 
- */
+   * Filter by Mitre.ID
+   * @param {*} id 
+   */
   addMitrefilter(id) {
     const filter = `{"meta":{"index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
     this.$rootScope.$emit('addNewKibanaFilter', { filter: JSON.parse(filter) });
